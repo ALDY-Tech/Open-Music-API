@@ -7,11 +7,11 @@ class AlbumsService {
     this._albums = [];
   }
 
-  addAlbum({ title, body, tags }) {
+  addAlbum({ name, year }) {
     const id = nanoid(16);
 
     const newAlbum = {
-      id, title,body,tags,
+      id, name, year,
     };
 
     this._albums.push(newAlbum);
@@ -36,7 +36,7 @@ class AlbumsService {
         return album;
     }
 
-    editAlbumById(id, { title, body, tags }) {
+    editAlbumById(id, { name, year }) {
         const index = this._albums.findIndex((album) => album.id === id);
         if (index === -1) {
             throw new NotFoundError("Gagal memperbarui album. Id tidak ditemukan");
@@ -44,15 +44,9 @@ class AlbumsService {
 
         this._albums[index] = {
             ...this._albums[index],
-            title,
-            body,
-            tags,
+            name,
+            year,
         };
-
-        const isSuccess = this._albums.filter((album) => album.id === id).length > 0;
-        if (!isSuccess) {
-            throw new InvariantError("Album gagal diperbarui");
-        }
     }
 
     deleteAlbumById(id) {
@@ -61,7 +55,6 @@ class AlbumsService {
             throw new NotFoundError("Album gagal dihapus. Id tidak ditemukan");
         }
         this._albums.splice(index, 1);
-        return { message: "Album berhasil dihapus" };
     }
 }
 
