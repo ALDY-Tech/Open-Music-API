@@ -47,6 +47,12 @@ class AlbumsService {
             name,
             year,
         };
+
+        const isSuccess = this._albums.filter((album) => album.id === id).length > 0;
+        if (!isSuccess) {
+            throw new InvariantError("Album gagal diperbarui");
+        }
+        return this._albums[index];
     }
 
     deleteAlbumById(id) {
