@@ -35,7 +35,7 @@ class SongsService {
         return song;
     }
 
-    editSongById(id, { title, year, genre, performer, duration, albumId }) {
+    editSongById(id, { title, year, performer, genre, duration, albumId }) {
         const index = this._songs.findIndex((song) => song.id === id);
         if (index === -1) {
             throw new NotFoundError("Gagal memperbarui song. Id tidak ditemukan");
@@ -45,8 +45,8 @@ class SongsService {
             ...this._songs[index],
             title,
             year,
-            genre,
             performer,
+            genre,
             duration,
             albumId,
         };
