@@ -1,19 +1,15 @@
+const autoBind = require("auto-bind");
+
 class PlaylistsHandler {
   constructor(service, validator) {
     this._service = service;
     this._validator = validator;
 
-    this.postPlaylistHandler = this.postPlaylistHandler.bind(this);
-    this.getPlaylistsHandler = this.getPlaylistsHandler.bind(this);
-    this.getPlaylistByIdHandler = this.getPlaylistByIdHandler.bind(this);
-    this.putPlaylistByIdHandler = this.putPlaylistByIdHandler.bind(this);
-    this.deletePlaylistByIdHandler = this.deletePlaylistByIdHandler.bind(this);
-    this.getSongsFromPlaylistHandler =
-      this.getSongsFromPlaylistHandler.bind(this);
+    autoBind(this);
   }
 
   async postPlaylistHandler(request, h) {
-    this._validator.validatePlaylistsload(request.payload);
+    this._validator.validatePlaylistPayload(request.payload);
     const { name } = request.payload;
     const { id: owner } = request.auth.credentials;
 
@@ -46,7 +42,7 @@ class PlaylistsHandler {
     const { id } = request.params;
     const { id: owner } = request.auth.credentials;
 
-    await this._service.verifyPlaylistOwner(id, owner);
+    await this._service.verifyPlaylistAccess(id, owner);
     const playlist = await this._service.getPlaylistById(id);
 
     return {
@@ -62,7 +58,7 @@ class PlaylistsHandler {
     const { id: owner } = request.auth.credentials;
 
     await this._service.verifyPlaylistOwner(id, owner);
-    this._validator.validatePlaylistsload(request.payload);
+    this._validator.validatePlaylistPayload(request.payload);
     const { name } = request.payload;
 
     await this._service.editPlaylistById(id, { name });
@@ -90,7 +86,7 @@ class PlaylistsHandler {
     const { id } = request.params;
     const { id: owner } = request.auth.credentials;
 
-    await this._service.verifyPlaylistOwner(id, owner);
+    await this._service.verifyPlaylistAccess(id, owner);
     const playlist = await this._service.getSongsFromPlaylist(id);
 
     return {
@@ -99,6 +95,63 @@ class PlaylistsHandler {
         playlist,
       },
     };
+  }
+
+  async postSongToPlaylistHandler(request, h) {
+    this._validator.validatePlaylistSongPayload(request.payload);
+    const { songId } = request.payload;
+    const { id } = request.params;
+    const { id: owner } = request.auth.credentials;
+
+    await this._service.verifyPlaylistAccess(id, owner);
+    await this._service.addSongToPlaylist(id, songId);
+
+    const response = h.response({
+      status: "success",
+      message: "Lagu berhasil ditambahkan ke playlist",
+    });
+    response.code(201);
+    return response;
+  }
+
+  async deleteSongFromPlaylistHandler(request) {
+    this._validator.validatePlaylistSongPayload(request.payload);
+    const { songId } = request.payload;
+    const { id } = request.params;
+    const { id: owner } = request.auth.credentials;
+
+    await this._service.verifyPlaylistAccess(id, owner);
+    await this._service.deleteSongFromPlaylist(id, songId);
+
+    return {
+      status: "success",
+      message: "Lagu berhasil dihapus dari playlist",
+    };
+  }
+
+  async addSongToPlaylist(playlistId, songId) {
+    const id = `playlistSong-${nanoid(16)}`;
+    const query = {
+      text: "INSERT INTO playlist_songs (id, playlist_id, song_id) VALUES($1, $2, $3) RETURNING id",
+      values: [id, playlistId, songId],
+    };
+    const result = await this._pool.query(query);
+    if (!result.rows.length) {
+      throw new InvariantError("Lagu gagal ditambahkan ke playlist");
+    }
+  }
+
+  async deleteSongFromPlaylist(playlistId, songId) {
+    const query = {
+      text: "DELETE FROM playlist_songs WHERE playlist_id = $1 AND song_id = $2 RETURNING id",
+      values: [playlistId, songId],
+    };
+    const result = await this._pool.query(query);
+    if (!result.rows.length) {
+      throw new NotFoundError(
+        "Lagu gagal dihapus dari playlist. Id tidak ditemukan"
+      );
+    }
   }
 }
 
