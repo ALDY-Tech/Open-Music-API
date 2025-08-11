@@ -12,29 +12,45 @@ class AuthenticationsHandler {
   }
 
   async postAuthenticationHandler(request, h) {
-    this._validator.validatePostAuthenticationPayload(request.payload);
+    try {
+      this._validator.validatePostAuthenticationPayload(request.payload);
 
-    const { username, password } = request.payload;
-    const id = await this._usersService.verifyUserCredential(
-      username,
-      password
-    );
+      const { username, password } = request.payload;
 
-    const accessToken = this._tokenManager.generateAccessToken({ id });
-    const refreshToken = this._tokenManager.generateRefreshToken({ id });
+      const userId = await this._usersService.verifyUserCredential(
+        username,
+        password
+      );
 
-    await this._authenticationsService.addRefreshToken(refreshToken);
+      const accessToken = this._tokenManager.generateAccessToken({
+        id: userId,
+      });
+      const refreshToken = this._tokenManager.generateRefreshToken({
+        id: userId,
+      });
 
-    const response = h.response({
-      status: "success",
-      message: "Authentication berhasil ditambahkan",
-      data: {
-        accessToken,
-        refreshToken,
-      },
-    });
-    response.code(201);
-    return response;
+      await this._authenticationsService.addRefreshToken(refreshToken);
+      return h
+        .response({
+          status: "success",
+          message: "Authentication berhasil ditambahkan",
+          data: {
+            accessToken,
+            refreshToken,
+          },
+        })
+        .code(201);
+    } catch (error) {
+      // Tangani error
+      console.error(error);
+
+      return h
+        .response({
+          status: "fail",
+          message: error.message || "Terjadi kesalahan pada proses login",
+        })
+        .code(error.statusCode || 400);
+    }
   }
 
   async putAuthenticationHandler(request, h) {

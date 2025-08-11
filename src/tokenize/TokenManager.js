@@ -1,6 +1,12 @@
 const Jwt = require("@hapi/jwt");
 const InvariantError = require("../exceptions/InvariantError");
 
+const { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY } = process.env;
+
+if (!ACCESS_TOKEN_KEY || !REFRESH_TOKEN_KEY) {
+  throw new Error("ACCESS_TOKEN_KEY and REFRESH_TOKEN_KEY must be defined in .env file");
+}
+
 const TokenManager = {
   generateAccessToken: (payload) =>
     Jwt.token.generate(payload, process.env.ACCESS_TOKEN_KEY),

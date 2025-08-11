@@ -1,7 +1,8 @@
-const modelAlbums = ({ id, name, year }) => ({
+const modelAlbums = ({ id, name, year, owner }) => ({
   id,
   name,
   year,
+  owner,
 });
 
 const modelSongs = ({ id, title, year, performer, genre, duration, albumId }) => ({

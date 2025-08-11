@@ -1,7 +1,7 @@
 
 exports.up = (pgm) => {
-  // membuat table collaborations
-  pgm.createTable("collaborations", {
+  // membuat table playlist_songs
+  pgm.createTable("playlist_songs", {
     id: {
       type: "VARCHAR(50)",
       primaryKey: true,
@@ -9,21 +9,21 @@ exports.up = (pgm) => {
     playlist_id: {
       type: "VARCHAR(50)",
       notNull: true,
-      references: "playlists",
       onDelete: "CASCADE",
       onUpdate: "CASCADE",
+      references: "playlists",
     },
-    user_id: {
+    song_id: {
       type: "VARCHAR(50)",
       notNull: true,
-      references: "users",
       onDelete: "CASCADE",
       onUpdate: "CASCADE",
+      references: "songs",
     },
   });
 };
 
 exports.down = (pgm) => {
-  // menghapus tabel collaborations
-  pgm.dropTable("collaborations");
+  // menghapus tabel playlist_songs
+  pgm.dropTable("playlist_songs");
 };

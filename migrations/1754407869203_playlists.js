@@ -1,19 +1,16 @@
 
 exports.up = (pgm) => {
-  // membuat table collaborations
-  pgm.createTable("collaborations", {
+  // membuat table playlists
+  pgm.createTable("playlists", {
     id: {
       type: "VARCHAR(50)",
       primaryKey: true,
     },
-    playlist_id: {
+    name: {
       type: "VARCHAR(50)",
       notNull: true,
-      references: "playlists",
-      onDelete: "CASCADE",
-      onUpdate: "CASCADE",
     },
-    user_id: {
+    owner: {
       type: "VARCHAR(50)",
       notNull: true,
       references: "users",
@@ -24,6 +21,6 @@ exports.up = (pgm) => {
 };
 
 exports.down = (pgm) => {
-  // menghapus tabel collaborations
-  pgm.dropTable("collaborations");
+  // menghapus tabel playlists
+  pgm.dropTable("playlists");
 };
