@@ -121,37 +121,12 @@ class PlaylistsHandler {
     const { id: owner } = request.auth.credentials;
 
     await this._service.verifyPlaylistAccess(id, owner);
-    await this._service.deleteSongFromPlaylist(id, songId);
+    await this._service.removeSongFromPlaylist(id, songId);
 
     return {
       status: "success",
       message: "Lagu berhasil dihapus dari playlist",
     };
-  }
-
-  async addSongToPlaylist(playlistId, songId) {
-    const id = `playlistSong-${nanoid(16)}`;
-    const query = {
-      text: "INSERT INTO playlist_songs (id, playlist_id, song_id) VALUES($1, $2, $3) RETURNING id",
-      values: [id, playlistId, songId],
-    };
-    const result = await this._pool.query(query);
-    if (!result.rows.length) {
-      throw new InvariantError("Lagu gagal ditambahkan ke playlist");
-    }
-  }
-
-  async deleteSongFromPlaylist(playlistId, songId) {
-    const query = {
-      text: "DELETE FROM playlist_songs WHERE playlist_id = $1 AND song_id = $2 RETURNING id",
-      values: [playlistId, songId],
-    };
-    const result = await this._pool.query(query);
-    if (!result.rows.length) {
-      throw new NotFoundError(
-        "Lagu gagal dihapus dari playlist. Id tidak ditemukan"
-      );
-    }
   }
 }
 
