@@ -6,12 +6,13 @@ module.exports = {
   version: "1.0.0",
   register: async (
     server,
-    { collaborationsService, notesService, validator }
+    { service, validator, playlistsService, usersService }
   ) => {
     const collaborationsHandler = new CollaborationsHandler(
-      collaborationsService,
-      notesService,
-      validator
+      service,
+      validator,
+      playlistsService,
+      usersService
     );
     server.route(routes(collaborationsHandler));
   },

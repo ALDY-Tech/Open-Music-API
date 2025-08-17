@@ -79,6 +79,18 @@ class UsersService {
 
     return id;
   }
+
+  async verifyUserExists(userId) {
+    const query = {
+      text: "SELECT id FROM users WHERE id = $1",
+      values: [userId],
+    };
+    const result = await this._pool.query(query);
+
+    if (!result.rowCount) {
+      throw new NotFoundError("User tidak ditemukan");
+    }
+  }
 }
 
 module.exports = UsersService;
