@@ -3,27 +3,27 @@ pgm.createTable('playlist_song_activities', {
     id: { type: 'varchar(50)', primaryKey: true },
     playlist_id: {
       type: 'varchar(50)',
-      references: '"playlists"',
+      references: 'playlists(id)',
       onDelete: 'CASCADE',
       onUpdate: 'CASCADE',
       notNull: true,
     },
     song_id: {
       type: 'varchar(50)',
-      references: '"songs"',
+      references: 'songs(id)',
       onDelete: 'CASCADE',
       onUpdate: 'CASCADE',
       notNull: true,
     },
     user_id: {
       type: 'varchar(50)',
-      references: '"users"',
+      references: 'users(id)',
       onDelete: 'CASCADE',
       onUpdate: 'CASCADE',
       notNull: true,
     },
     action: { type: 'text', notNull: true },
-    time: { type: 'timestamp', notNull: true, default: pgm.func('current_timestamp') },
+    time: { type: 'text', notNull: true },
   });
 };
 
