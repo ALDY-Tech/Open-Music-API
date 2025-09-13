@@ -4,7 +4,7 @@ const routes = (handler) => [
     path: "/playlists/{id}/songs",
     handler: (request, h) => handler.postPlaylistSongHandler(request, h),
     options: {
-      auth: "openmusic_jwt",
+      auth: "open_music_jwt",
     },
   },
   {
@@ -12,7 +12,7 @@ const routes = (handler) => [
     path: "/playlists/{id}/songs",
     handler: (request, h) => handler.getPlaylistSongsHandler(request, h),
     options: {
-      auth: "openmusic_jwt",
+      auth: "open_music_jwt",
     },
   },
   {
@@ -20,7 +20,7 @@ const routes = (handler) => [
     path: "/playlists/{id}/songs",
     handler: (request, h) => handler.deletePlaylistSongHandler(request, h),
     options: {
-      auth: "openmusic_jwt",
+      auth: "open_music_jwt",
     },
   },
 ];

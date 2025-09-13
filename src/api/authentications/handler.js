@@ -1,63 +1,42 @@
 class AuthenticationsHandler {
-  constructor(authenticationsService, usersService, tokenManager, validator) {
-    this._authenticationsService = authenticationsService;
-    this._usersService = usersService;
+  constructor(service, tokenManager, validator, usersService) {
+    this._service = service;
     this._tokenManager = tokenManager;
     this._validator = validator;
-
-    this.postAuthenticationHandler = this.postAuthenticationHandler.bind(this);
-    this.putAuthenticationHandler = this.putAuthenticationHandler.bind(this);
-    this.deleteAuthenticationHandler =
-      this.deleteAuthenticationHandler.bind(this);
+    this._usersService = usersService;
   }
 
   async postAuthenticationHandler(request, h) {
-    try {
-      this._validator.validatePostAuthenticationPayload(request.payload);
+    this._validator.validatePostAuthenticationPayload(request.payload);
 
-      const { username, password } = request.payload;
+    const { username, password } = request.payload;
+    const id = await this._usersService.verifyUserCredential(
+      username,
+      password
+    );
 
-      const userId = await this._usersService.verifyUserCredential(
-        username,
-        password
-      );
+    const accessToken = this._tokenManager.generateAccessToken({ id });
+    const refreshToken = this._tokenManager.generateRefreshToken({ id });
 
-      const accessToken = this._tokenManager.generateAccessToken({
-        id: userId,
-      });
-      const refreshToken = this._tokenManager.generateRefreshToken({
-        id: userId,
-      });
+    await this._service.addRefreshToken(refreshToken);
 
-      await this._authenticationsService.addRefreshToken(refreshToken);
-      return h
-        .response({
-          status: "success",
-          message: "Authentication berhasil ditambahkan",
-          data: {
-            accessToken,
-            refreshToken,
-          },
-        })
-        .code(201);
-    } catch (error) {
-      // Tangani error
-      console.error(error);
-
-      return h
-        .response({
-          status: "fail",
-          message: error.message || "Terjadi kesalahan pada proses login",
-        })
-        .code(error.statusCode || 400);
-    }
+    const response = h.response({
+      status: "success",
+      message: "Authentication berhasil ditambahkan",
+      data: {
+        accessToken,
+        refreshToken,
+      },
+    });
+    response.code(201);
+    return response;
   }
 
-  async putAuthenticationHandler(request, h) {
+  async putAuthenticationHandler(request) {
     this._validator.validatePutAuthenticationPayload(request.payload);
 
     const { refreshToken } = request.payload;
-    await this._authenticationsService.verifyRefreshToken(refreshToken);
+    await this._service.verifyRefreshToken(refreshToken);
     const { id } = this._tokenManager.verifyRefreshToken(refreshToken);
 
     const accessToken = this._tokenManager.generateAccessToken({ id });
@@ -70,12 +49,12 @@ class AuthenticationsHandler {
     };
   }
 
-  async deleteAuthenticationHandler(request, h) {
+  async deleteAuthenticationHandler(request) {
     this._validator.validateDeleteAuthenticationPayload(request.payload);
 
     const { refreshToken } = request.payload;
-    await this._authenticationsService.verifyRefreshToken(refreshToken);
-    await this._authenticationsService.deleteRefreshToken(refreshToken);
+    await this._service.verifyRefreshToken(refreshToken);
+    await this._service.deleteRefreshToken(refreshToken);
 
     return {
       status: "success",

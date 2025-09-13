@@ -1,26 +1,18 @@
-
 exports.up = (pgm) => {
-  // membuat table playlists
   pgm.createTable("playlists", {
-    id: {
-      type: "VARCHAR(50)",
-      primaryKey: true,
-    },
-    name: {
-      type: "VARCHAR(50)",
-      notNull: true,
-    },
+    id: { type: "text", primaryKey: true },
+    name: { type: "text", notNull: true },
     owner: {
-      type: "VARCHAR(50)",
-      notNull: true,
+      type: "text",
       references: "users(id)",
+      notNull: true,
       onDelete: "CASCADE",
-      onUpdate: "CASCADE",
     },
   });
 };
 
 exports.down = (pgm) => {
-  // menghapus tabel playlists
+  pgm.dropConstraint("playlists", "playlists_owner_fkey");
+
   pgm.dropTable("playlists");
 };

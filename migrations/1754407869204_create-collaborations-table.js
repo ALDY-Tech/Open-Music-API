@@ -1,29 +1,25 @@
 
 exports.up = (pgm) => {
-  // membuat table collaborations
   pgm.createTable("collaborations", {
-    id: {
-      type: "VARCHAR(50)",
-      primaryKey: true,
-    },
+    id: { type: "text", primaryKey: true },
     playlist_id: {
-      type: "VARCHAR(50)",
-      notNull: true,
+      type: "text",
       references: "playlists(id)",
+      notNull: true,
       onDelete: "CASCADE",
-      onUpdate: "CASCADE",
     },
     user_id: {
-      type: "VARCHAR(50)",
-      notNull: true,
+      type: "text",
       references: "users(id)",
+      notNull: true,
       onDelete: "CASCADE",
-      onUpdate: "CASCADE",
-    },
+    }, 
   });
 };
 
 exports.down = (pgm) => {
-  // menghapus tabel collaborations
+  pgm.dropConstraint("collaborations", "collaborations_playlist_id_fkey");
+  pgm.dropConstraint("collaborations", "collaborations_user_id_fkey");
+
   pgm.dropTable("collaborations");
 };

@@ -1,40 +1,25 @@
 
 exports.up = (pgm) => {
   pgm.createTable("songs", {
-    id: {
-      type: "VARCHAR(50)",
-      primaryKey: true,
-    },
-    title: {
-      type: "VARCHAR(100)",
-      notNull: true,
-    },
-    year: {
-      type: "INT",
-      notNull: true,
-    },
-    performer: {
-      type: "VARCHAR(100)",
-      notNull: true,
-    },
-    genre: {
-      type: "VARCHAR(50)",
-      notNull: true,
-    },
-    duration: {
-      type: "INT",
-      notNull: false,
-    },
+    id: { type: "text", primaryKey: true },
+    title: { type: "text", notNull: true },
+    year: { type: "integer", notNull: true },
+    genre: { type: "text", notNull: true },
+    performer: { type: "text", notNull: true },
+    duration: { type: "integer" },
     album_id: {
-      type: "VARCHAR(50)",
-      notNull: false,
+      type: "text",
       references: "albums(id)",
       onDelete: "CASCADE",
-      onUpdate: "CASCADE",
     },
+    created_at: { type: "bigint", notNull: true },
+    updated_at: { type: "bigint", notNull: true },
   });
 };
 
+
 exports.down = (pgm) => {
+  pgm.dropConstraint("songs", "songs_album_id_fkey");
+
   pgm.dropTable("songs");
 };
