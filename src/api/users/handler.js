@@ -8,15 +8,11 @@ class UsersHandler {
     this._validator.validateUserPayload(request.payload);
     const { username, password, fullname } = request.payload;
 
-    const userId = await this._service.addUser({
-      username,
-      password,
-      fullname,
-    });
+    const userId = await this._service.addUser({ username, password, fullname });
 
     const response = h.response({
-      status: "success",
-      message: "User berhasil ditambahkan",
+      status: 'success',
+      message: 'User berhasil ditambahkan',
       data: {
         userId,
       },
@@ -31,7 +27,7 @@ class UsersHandler {
     const user = await this._service.getUserById(id);
 
     return {
-      status: "success",
+      status: 'success',
       data: {
         user,
       },
@@ -39,12 +35,12 @@ class UsersHandler {
   }
 
   async getUsersByUsernameHandler(request) {
-    const { username = "" } = request.query;
+    const { username = '' } = request.query;
 
     const users = await this._service.getUsersByUsername(username);
 
     return {
-      status: "success",
+      status: 'success',
       data: {
         users,
       },
